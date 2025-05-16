@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>抽卡 - Word Hunter</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: white;
+      font-family: Arial, sans-serif;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #points {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 18px;
+    }
+
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 28px;
+    }
+
+    .draw-button {
+      padding: 14px 28px;
+      font-size: 18px;
+      background: linear-gradient(45deg, gold, orange);
+      border: none;
+      border-radius: 10px;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 12px gold;
+      margin: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .draw-button:hover {
+      transform: scale(1.05);
+    }
+
+    .card-container {
+      width: 240px;
+      height: 340px;
+      perspective: 1000px;
+      display: none;
+      margin-top: 40px;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      background: url('card-back.jpg') no-repeat center/cover;
+      box-shadow: 0 0 20px gold, 0 0 40px orange;
+      animation: none;
+      position: relative;
+    }
+
+    .card.falling {
+      animation: fall 0.6s ease forwards;
+    }
+
+    .card.spin-glow {
+      animation: spin 2s linear infinite, glow 1s infinite alternate;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(-300px) scale(0.5); opacity: 0; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    @keyframes spin {
+      from { transform: rotateY(0deg); }
+      to { transform: rotateY(360deg); }
+    }
+
+    @keyframes glow {
+      0% { box-shadow: 0 0 15px gold, 0 0 30px orange; }
+      100% { box-shadow: 0 0 30px gold, 0 0 60px orange; }
+    }
+
+    #multiCardStage {
+      display: none;
+      margin-top: 40px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .card-preview {
+      width: 160px;
+      height: 220px;
+      background: url('card-back.jpg') no-repeat center/cover;
+      border-radius: 12px;
+      box-shadow: 0 0 15px gold, 0 0 30px orange;
+      animation: spin 2s linear infinite, glow 1s infinite alternate;
+    }.navbar {
+  background-color: #ffcc00; /* 明亮黄 */
+  width: 100vw;
+  padding: 14px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.nav-left {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+
+.nav-link {
+  color: black;              /* ✅ 黑字 */
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #ff6600;            /* 🔥 hover 橙色 */
+}
+
+.points-display {
+  color: black;              /* ✅ 统一黑字积分 */
+  font-size: 16px;
+  font-weight: bold;
+}
+.main-content {
+  padding-top: 30px;  /* ✅ 避免贴着导航栏太紧 */
+}
+
+  </style>
+</head>
+<body>
+  
+<div class="navbar">
+  <div class="nav-left">
+    <a href="draw.html" class="nav-link">🃏 抽卡</a>
+    <a href="gallery.html" class="nav-link">🖼 图鉴</a>
+    <a href="audio.html" class="nav-link">🎧 听力练习</a>
+    <a href="wrong.html" class="nav-link">📘 错题本</a>
+    <a href="home.html" class="nav-link">🏠 主页</a>
+  </div>
+  <div class="points-display" id="pointsDisplay">积分：4702</div>
+</div>
+
+
+  <div class="main-content">
+    <h1>抽卡时间到！</h1>
+
+    <div>
+      <button class="draw-button" onclick="startSingleDraw()">单抽（消耗10积分）</button>
+      <button class="draw-button" onclick="startFiveDraw()">五连抽（消耗50积分）</button>
+    </div>
+
+    <div class="card-container" id="cardContainer">
+      <div class="card" id="card"></div>
+    </div>
+
+    <div id="multiCardStage"></div>
+  </div>
+
+  <script>
+    // 初始化积分
+    if (localStorage.getItem("points") === null) {
+      localStorage.setItem("points", "100");
+    }
+
+    function updatePointsDisplay() {
+     const pointValue = localStorage.getItem("points");
+const displayElement = document.getElementById("pointValue");
+const navPoints = document.getElementById("pointsDisplay");
+
+if (displayElement) displayElement.innerText = pointValue;
+if (navPoints) navPoints.innerText = `积分：${pointValue}`;
+
+    }
+
+    updatePointsDisplay();
+
+    function startSingleDraw() {
+      let currentPoints = parseInt(localStorage.getItem("points"));
+      if (currentPoints < 10) {
+        alert("积分不足，无法抽卡！");
+        return;
+      }
+
+      currentPoints -= 10;
+      localStorage.setItem("points", currentPoints);
+      updatePointsDisplay();
+
+      const cardContainer = document.getElementById("cardContainer");
+      const card = document.getElementById("card");
+
+      card.classList.remove("spin-glow");
+      card.classList.remove("falling");
+      void card.offsetWidth;
+
+      cardContainer.style.display = "block";
+      card.classList.add("falling");
+
+      setTimeout(() => {
+        card.classList.add("spin-glow");
+      }, 600);
+
+      setTimeout(() => {
+        const cards = ["pai.html", "station.html", "city.html", "bear.html", "flower.html"];
+        const selectedCard = cards[Math.floor(Math.random() * cards.length)];
+        localStorage.setItem("lastCard", selectedCard);
+        window.location.href = "result.html";
+      }, 3000);
+    }
+
+    function startFiveDraw() {
+      let currentPoints = parseInt(localStorage.getItem("points"));
+      if (currentPoints < 50) {
+        alert("积分不足，无法进行五连抽！");
+        return;
+      }
+
+      currentPoints -= 50;
+      localStorage.setItem("points", currentPoints);
+      updatePointsDisplay();
+
+      const allCards = ["pai.html", "station.html", "city.html", "bear.html", "flower.html"];
+      const drawnCards = [];
+      for (let i = 0; i < 5; i++) {
+        const selected = allCards[Math.floor(Math.random() * allCards.length)];
+        drawnCards.push(selected);
+      }
+
+      localStorage.setItem("lastFiveCards", JSON.stringify(drawnCards));
+
+      const stage = document.getElementById("multiCardStage");
+      stage.style.display = "flex";
+      stage.innerHTML = "";
+
+      for (let i = 0; i < 5; i++) {
+        const card = document.createElement("div");
+        card.className = "card-preview";
+        stage.appendChild(card);
+      }
+
+      setTimeout(() => {
+        window.location.href = "result5.html";
+      }, 3000);
+    }
+  </script>
+
+</body>
+</html>

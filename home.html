@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>控制台主页</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 40px auto;
+      max-width: 800px;
+    }
+    .card {
+      position: relative;
+      width: 300px;
+      margin: 20px;
+      padding: 30px;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.25), rgba(0,0,0,0.1));
+      z-index: 0;
+    }
+    .card * { position: relative; z-index: 1; }
+    .card h2 { margin-bottom: 15px; font-size: 22px; }
+    .card p { font-size: 15px; line-height: 1.4; }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+    }
+    .task { background-color: #007bff; }
+    .draw { background-color: #f39c12; }
+    .collection { background-color: #8e44ad; }
+    .settings { background-color: #95a5a6; }
+    .ai { background-color: #2ecc71; }
+    .topbar { font-size: 16px; color: #444; padding: 10px 0; }
+    .footer { margin-top: 40px; color: #aaa; font-size: 13px; }
+.navbar {
+  background-color: #007bff;
+  width: 100vw;
+  padding: 14px 40px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+}
+
+.nav-left {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #ffd700;
+}
+
+.points-display {
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+}
+
+    #checkinNotice {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(45deg, gold, orange);
+      color: black;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: bold;
+      box-shadow: 0 0 15px gold;
+      z-index: 999;
+    }
+    #aiModule {
+      display: none;
+      margin: 60px auto 40px;
+      padding: 30px;
+      max-width: 600px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    #searchInput {
+      padding: 10px;
+      width: 80%;
+      max-width: 300px;
+      margin-bottom: 10px;
+    }
+    .ai-button {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    .card-result {
+      background: #fff;
+      border-left: 5px solid #007bff;
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 6px;
+      line-height: 1.6;
+      font-size: 14px;
+      text-align: left;
+    }
+ .card.wrong {
+  background: linear-gradient(135deg, #6c757d, #5a6268);
+  color: white;
+}
+.card.audio {
+  background: linear-gradient(135deg, #20c997, #17a2b8);
+  color: white;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+    
+  </style>
+</head>
+<body>
+
+  <div id="checkinNotice">🎉 签到成功！获得 5 积分！</div>
+<div class="navbar">
+  <div class="nav-left">
+    <a href="draw.html" class="nav-link">🃏 抽卡</a>
+    <a href="gallery.html" class="nav-link">🖼 图鉴</a>
+    <a href="audio.html" class="nav-link">🎧 听力练习</a>
+    <a href="wrong.html" class="nav-link">📘 错题本</a>
+    <a href="home.html" class="nav-link">🏠 主页</a>
+  </div>
+  <div class="points-display" id="pointsDisplay">积分：4702</div>
+</div>
+
+  <div class="topbar" id="userInfo">加载中...</div>
+  <div class="topbar" id="checkinStreak">连续签到：加载中...</div>
+
+
+  <div class="container">
+    <div class="card task" onclick="goTo('task.html')">
+      <h2>开始任务</h2>
+      <p>完成每日任务，解锁抽卡机会</p>
+    </div>
+
+    <div class="card draw" onclick="goTo('draw.html')">
+      <h2>抽卡系统</h2>
+      <p>抽取专属卡片，记录每一次努力</p>
+    </div>
+
+    <div class="card collection" onclick="goTo('collection.html')">
+      <h2>图鉴图册</h2>
+      <p>查看你获得的卡牌收藏</p>
+    </div>
+
+    <div class="card settings" onclick="goTo('settings.html')">
+      <h2>个人设置</h2>
+      <p>修改昵称、重置数据、管理本地信息</p>
+    </div>
+
+    <div class="card ai" onclick="document.getElementById('aiModule').style.display='block';">
+      <h2>AI 点一点</h2>
+      <p>输入单词，让 AI 帮你解释并匹配句子</p>
+    </div>
+  </div>
+
+ <div class="row">
+  <div class="card wrong" onclick="window.location.href='wrong.html'">
+    <h2>📘 错题本</h2>
+    <p>查看答错的题目，支持回顾与复习</p>
+  </div>
+
+  <div class="card audio" onclick="window.location.href='audio.html'">
+    <h2>🎧 听力练习</h2>
+    <p>集中播放所有音频题，强化听力感知</p>
+  </div>
+</div>
+
+
+
+
+  <div class="footer">
+    系统 Beta 版本 | 本地运行中
+  </div>
+
+  <script>
+    const wfdData = [
+  {
+    "id": 1,
+    "sentence": "A group meeting will be held by tomorrow in the library conference room",
+    "audio": "audio/001.mp3"
+  },
+  {
+    "id": 2,
+    "sentence": "A number of students have volunteer jobs",
+    "audio": "audio/002.mp3"
+  },
+  {
+    "id": 3,
+    "sentence": "We can all meet at my office after the lecture",
+    "audio": "audio/003.mp3"
+  },
+  {
+    "id": 4,
+    "sentence": "Tutorials are scheduled in the final week of the term",
+    "audio": "audio/004.mp3"
+  },
+  {
+    "id": 5,
+    "sentence": "You can make an appointment to meet the librarian",
+    "audio": "audio/005.mp3"
+  },
+  {
+    "id": 6,
+    "sentence": "Agenda items should be submitted by the end of the day",
+    "audio": "audio/006.mp3"
+  },
+  {
+    "id": 7,
+    "sentence": "All dissertations must be accompanied by a submission form",
+    "audio": "audio/007.mp3"
+  },
+  {
+    "id": 8,
+    "sentence": "All of the assignments must be submitted by in person to the faculty office",
+    "audio": "audio/008.mp3"
+  },
+  {
+    "id": 9,
+    "sentence": "Economic development needs to be supported by the government",
+    "audio": "audio/009.mp3"
+  },
+  {
+    "id": 10,
+    "sentence": "All of your assignments are due by tomorrow",
+    "audio": "audio/010.mp3"
+  },
+  {
+    "id": 11,
+    "sentence": "An introduction is an essential element of presentation",
+    "audio": "audio/011.mp3"
+  },
+  {
+    "id": 12,
+    "sentence": "The assignments should be submitted to the department office before the deadlines",
+    "audio": "audio/012.mp3"
+  },
+  {
+    "id": 13,
+    "sentence": "Consumer confidence has a direct influence on sales",
+    "audio": "audio/013.mp3"
+  },
+  {
+    "id": 14,
+    "sentence": "Economic problems caused a big rise in unemployment",
+    "audio": "audio/014.mp3"
+  },
+  {
+    "id": 15,
+    "sentence": "Tomorrow’s lecture has been cancelled due to the power cut",
+    "audio": "audio/015.mp3"
+  },
+  {
+    "id": 16,
+    "sentence": "Students are permitted to park at campus parking spaces",
+    "audio": "audio/016.mp3"
+  },
+  {
+    "id": 17,
+    "sentence": "Our professor is hosting the business development conference",
+    "audio": "audio/017.mp3"
+  },
+  {
+    "id": 18,
+    "sentence": "The designers will complete the plan later today",
+    "audio": "audio/018.mp3"
+  },
+  {
+    "id": 19,
+    "sentence": "Assignments must be submitted at the end of the term",
+    "audio": "audio/019.mp3"
+  },
+  {
+    "id": 20,
+    "sentence": "The visiting speaker used to be a lecturer in this department",
+    "audio": "audio/020.mp3"
+  },
+  {
+    "id": 21,
+    "sentence": "There is a clear need for further research in this field",
+    "audio": "audio/021.mp3"
+  },
+  {
+    "id": 22,
+    "sentence": "It would be extremely beneficial to work together",
+    "audio": "audio/022.mp3"
+  },
+  {
+    "id": 23,
+    "sentence": "This project is divided into four main sections",
+    "audio": "audio/023.mp3"
+  },
+  {
+    "id": 24,
+    "sentence": "Understanding how to use the library will save your time",
+    "audio": "audio/024.mp3"
+  },
+  {
+    "id": 25,
+    "sentence": "University fees are expected to increase next year",
+    "audio": "audio/025.mp3"
+  },
+  {
+    "id": 26,
+    "sentence": "Find out how to get resources before your research",
+    "audio": "audio/026.mp3"
+  },
+  {
+    "id": 27,
+    "sentence": "Every student has both the right and the ability to succeed",
+    "audio": "audio/027.mp3"
+  },
+  {
+    "id": 28,
+    "sentence": "A good research assistant is not afraid to ask questions",
+    "audio": "audio/028.mp3"
+  },
+  {
+    "id": 29,
+    "sentence": "Making mistakes is fine as long as you learn from them",
+    "audio": "audio/029.mp3"
+  },
+  {
+    "id": 30,
+    "sentence": "We have a lecture in the morning on Thursday",
+    "audio": "audio/030.mp3"
+  },
+  {
+    "id": 31,
+    "sentence": "The site is designed to be highly interactive.",
+    "audio": "audio/031.mp3"
+  },
+  {
+    "id": 32,
+    "sentence": "You should submit your term papers to the general office",
+    "audio": "audio/032.mp3"
+  },
+  {
+    "id": 33,
+    "sentence": "We hold visiting hours throughout the year for students",
+    "audio": "audio/033.mp3"
+  },
+  {
+    "id": 34,
+    "sentence": "This book can be borrowed for a maximum of one week",
+    "audio": "audio/034.mp3"
+  },
+  {
+    "id": 35,
+    "sentence": "Every student has regular meetings with his or her personal tutor",
+    "audio": "audio/035.mp3"
+  },
+  {
+    "id": 36,
+    "sentence": "It takes a long time to walk to university",
+    "audio": "audio/036.mp3"
+  },
+  {
+    "id": 37,
+    "sentence": "Slides and handouts can be downloaded after lectures",
+    "audio": "audio/037.mp3"
+  },
+  {
+    "id": 38,
+    "sentence": "Information technology has changed the way people study today",
+    "audio": "audio/038.mp3"
+  },
+  {
+    "id": 39,
+    "sentence": "The library will stay open until midnight this week",
+    "audio": "audio/039.mp3"
+  },
+  {
+    "id": 40,
+    "sentence": "Many university lectures can now be viewed on the internet",
+    "audio": "audio/040.mp3"
+  },
+  {
+    "id": 41,
+    "sentence": "Urbanization provides the expenses of other communities",
+    "audio": "audio/041.mp3"
+  },
+  {
+    "id": 42,
+    "sentence": "There are many different styles of business management",
+    "audio": "audio/042.mp3"
+  },
+  {
+    "id": 43,
+    "sentence": "The history of economics is a tricky subject to study",
+    "audio": "audio/043.mp3"
+  },
+  {
+    "id": 44,
+    "sentence": "Air pollution is a serious problem all over the world",
+    "audio": "audio/044.mp3"
+  },
+  {
+    "id": 45,
+    "sentence": "The course will start with the history of architecture",
+    "audio": "audio/045.mp3"
+  },
+  {
+    "id": 46,
+    "sentence": "Please note that the seminar has now been cancelled",
+    "audio": "audio/046.mp3"
+  },
+  {
+    "id": 47,
+    "sentence": "Scholarship applications must be handed in at the end of this month",
+    "audio": "audio/047.mp3"
+  },
+  {
+    "id": 48,
+    "sentence": "Please return your reference books to the library shelves",
+    "audio": "audio/048.mp3"
+  },
+  {
+    "id": 49,
+    "sentence": "Our workshops are opening for all students on campus (29)",
+    "audio": "audio/049.mp3"
+  },
+  {
+    "id": 50,
+    "sentence": "The deadline for this assignment is next Wednesday",
+    "audio": "audio/050.mp3"
+  },
+  {
+    "id": 51,
+    "sentence": "Scholarships are available for both local and international students",
+    "audio": "audio/051.mp3"
+  },
+  {
+    "id": 52,
+    "sentence": "All students have their own style of learning",
+    "audio": "audio/052.mp3"
+  },
+  {
+    "id": 53,
+    "sentence": "We help individuals to develop and follow their interests.",
+    "audio": "audio/053.mp3"
+  },
+  {
+    "id": 54,
+    "sentence": "Our company currently employs more than ten thousand people worldwide",
+    "audio": "audio/054.mp3"
+  },
+  {
+    "id": 55,
+    "sentence": "It is clear that the human population has an impact on the environment",
+    "audio": "audio/055.mp3"
+  },
+  {
+    "id": 56,
+    "sentence": "Every living thing begins as a single cell",
+    "audio": "audio/056.mp3"
+  },
+  {
+    "id": 57,
+    "sentence": "Technology is no longer a simple tool that we can control",
+    "audio": "audio/057.mp3"
+  },
+  {
+    "id": 58,
+    "sentence": "British students must study mathematics at secondary schools",
+    "audio": "audio/058.mp3"
+  },
+  {
+    "id": 59,
+    "sentence": "You need to hand in an essay next semester",
+    "audio": "audio/059.mp3"
+  },
+  {
+    "id": 60,
+    "sentence": "Please click on the logo above to enter the site",
+    "audio": "audio/060.mp3"
+  },
+  {
+    "id": 61,
+    "sentence": "If you need a parking ticket, see me after the lecture",
+    "audio": "audio/061.mp3"
+  },
+  {
+    "id": 62,
+    "sentence": "Advanced technology created growth in the economy",
+    "audio": "audio/062.mp3"
+  },
+  {
+    "id": 63,
+    "sentence": "Optional tutorials are offered in the final week of the term",
+    "audio": "audio/063.mp3"
+  },
+  {
+    "id": 64,
+    "sentence": "The aim of the course is to encourage students to develop their creativity",
+    "audio": "audio/064.mp3"
+  },
+  {
+    "id": 65,
+    "sentence": "Scientists have founded all parts of society today",
+    "audio": "audio/065.mp3"
+  },
+  {
+    "id": 66,
+    "sentence": "Practical experience is a vital part of legal training",
+    "audio": "audio/066.mp3"
+  },
+  {
+    "id": 67,
+    "sentence": "There is a pharmacy on campus near the bookstore",
+    "audio": "audio/067.mp3"
+  },
+  {
+    "id": 68,
+    "sentence": "The lecture will take place in the main hall",
+    "audio": "audio/068.mp3"
+  },
+  {
+    "id": 69,
+    "sentence": "A wide range of courses covered different aspects in this subject",
+    "audio": "audio/069.mp3"
+  },
+  {
+    "id": 70,
+    "sentence": "In his lifetime, he composed a large number of works",
+    "audio": "audio/070.mp3"
+  },
+  {
+    "id": 71,
+    "sentence": "Please confirm that you have received the textbook",
+    "audio": "audio/071.mp3"
+  },
+  {
+    "id": 72,
+    "sentence": "I will come back to this in a moment",
+    "audio": "audio/072.mp3"
+  },
+  {
+    "id": 73,
+    "sentence": "The student shop sells a range of stationery",
+    "audio": "audio/073.mp3"
+  },
+  {
+    "id": 74,
+    "sentence": "Let me give you an example to explain what I mean",
+    "audio": "audio/074.mp3"
+  },
+  {
+    "id": 75,
+    "sentence": "She began by giving an outline of the previous lecture",
+    "audio": "audio/075.mp3"
+  },
+  {
+    "id": 76,
+    "sentence": "The timetable for the next term will be available next week",
+    "audio": "audio/076.mp3"
+  },
+  {
+    "id": 77,
+    "sentence": "Most of the lectures begin punctually, so do not be late",
+    "audio": "audio/077.mp3"
+  },
+  {
+    "id": 78,
+    "sentence": "The student union hosts a variety of social events",
+    "audio": "audio/078.mp3"
+  },
+  {
+    "id": 79,
+    "sentence": "The museum is closed on the third Monday of every month",
+    "audio": "audio/079.mp3"
+  },
+  {
+    "id": 80,
+    "sentence": "Our faculty includes five libraries across the university",
+    "audio": "audio/080.mp3"
+  },
+  {
+    "id": 81,
+    "sentence": "Critical thinking is an essential component of a broad education.",
+    "audio": "audio/081.mp3"
+  },
+  {
+    "id": 82,
+    "sentence": "The jobs tomorrow will require higher skill levels",
+    "audio": "audio/082.mp3"
+  },
+  {
+    "id": 83,
+    "sentence": "The goal of the government policy is to increase the investments",
+    "audio": "audio/083.mp3"
+  },
+  {
+    "id": 84,
+    "sentence": "Courses are assessed by group work and individual assignments",
+    "audio": "audio/084.mp3"
+  },
+  {
+    "id": 85,
+    "sentence": "Online courses allow students to work at their own pace",
+    "audio": "audio/085.mp3"
+  },
+  {
+    "id": 86,
+    "sentence": "The internet has transformed the nature of publishing",
+    "audio": "audio/086.mp3"
+  },
+  {
+    "id": 87,
+    "sentence": "More research is required in the field of food science",
+    "audio": "audio/087.mp3"
+  },
+  {
+    "id": 88,
+    "sentence": "Many important policies need to be made",
+    "audio": "audio/088.mp3"
+  },
+  {
+    "id": 89,
+    "sentence": "For the small business, making profit is the main priority",
+    "audio": "audio/089.mp3"
+  },
+  {
+    "id": 90,
+    "sentence": "The falling birth rate means the number of students dropped",
+    "audio": "audio/90.mp3"
+  },
+  {
+    "id": 91,
+    "sentence": "Employment figures will decrease in the next few years",
+    "audio": "audio/91.mp3"
+  },
+  {
+    "id": 92,
+    "sentence": "Medical books and journals have been moved to the second floor",
+    "audio": "audio/92.mp3"
+  },
+  {
+    "id": 93,
+    "sentence": "Gold is a metal that appears naturally and in a pure state",
+    "audio": "audio/93.mp3"
+  },
+  {
+    "id": 94,
+    "sentence": "Your tutor will show you how to prepare the essay",
+    "audio": "audio/94.mp3"
+  },
+  {
+    "id": 95,
+    "sentence": "Music has the ability to shape our emotions",
+    "audio": "audio/95.mp3"
+  },
+  {
+    "id": 96,
+    "sentence": "Career opportunities in this field are quite limited",
+    "audio": "audio/96.mp3"
+  },
+];
+
+    function goTo(page) {
+      window.location.href = page;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const userId = localStorage.getItem("userId") || "未知";
+      const nickname = localStorage.getItem("userNickname") || "未命名用户";
+      const progress = localStorage.getItem("taskProgress") || 0;
+      const points = parseInt(localStorage.getItem("points")) || 0;
+      const streak = parseInt(localStorage.getItem("checkinStreak")) || 0;
+      document.getElementById("userInfo").innerText = `你好，${nickname}（ID: ${userId}）｜ 今日任务进度：${progress} / 50`;
+      document.getElementById("pointsDisplay").innerText = `积分：${points}`;
+      document.getElementById("checkinStreak").innerText = `连续签到：${streak} 天`;
+    });
+
+    (function dailyCheckin() {
+      const today = new Date().toDateString();
+      const lastCheckin = localStorage.getItem("lastCheckin");
+      let points = parseInt(localStorage.getItem("points")) || 0;
+      let streak = parseInt(localStorage.getItem("checkinStreak")) || 0;
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toDateString();
+
+      if (lastCheckin !== today) {
+        if (lastCheckin === yesterdayStr) streak += 1;
+        else streak = 1;
+        let reward = 5;
+        const cycleDay = streak % 7;
+        if (cycleDay === 3 || cycleDay === 0) reward += 5;
+        points += reward;
+        localStorage.setItem("points", points);
+        localStorage.setItem("lastCheckin", today);
+        localStorage.setItem("checkinStreak", streak);
+        const notice = document.getElementById("checkinNotice");
+        if (notice) {
+          notice.innerText = `🎉 签到成功！获得 ${reward} 积分！`;
+          notice.style.display = "block";
+          setTimeout(() => { notice.style.display = "none"; }, 4000);
+        }
+        document.getElementById("pointsDisplay").innerText = `积分：${points}`;
+        document.getElementById("checkinStreak").innerText = `连续签到：${streak} 天`;
+      }
+    })();
+
+    function normalize(word) {
+      return word.toLowerCase().replace(/(ed|s|ing)$/, '');
+    }
+
+    function search() {
+      const keyword = normalize(document.getElementById("searchInput").value.trim());
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+
+      if (!keyword) {
+        resultsDiv.innerHTML = "<p>请输入单词</p>";
+        return;
+      }
+
+      explainWord(keyword);
+      loadWFDSentences(keyword);
+    }
+
+    async function explainWord(word) {
+      const apiKey = "Bearer cd36d50e081044d99e1d32351c52cc98.zFxAEVWLHCmFuS2n";
+      const explainDiv = document.createElement("div");
+      explainDiv.className = "card-result";
+      explainDiv.innerHTML = "<em>正在加载 AI 解释...</em>";
+      document.getElementById("results").appendChild(explainDiv);
+
+      try {
+        const res = await fetch("https://open.bigmodel.cn/api/paas/v3/model-api/chatglm_turbo/invoke", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": apiKey
+          },
+          body: JSON.stringify({
+            prompt: `请根据用户输入的英文单词 "${word}"，按以下格式返回内容：\n[中文释义] 中文意思\n[英文例句] 英文例句\n[鼓励话语] 鼓励语`,
+            temperature: 0.7,
+            top_p: 0.9
+          })
+        });
+
+        const data = await res.json();
+        const content = data.data?.choices?.[0]?.content || "";
+
+        const extract = (label) => {
+          const match = content.match(new RegExp(`\\[${label}\\](.*?)($|\\[)`, 's'));
+          return match ? match[1].trim() : "（无内容）";
+        };
+
+        explainDiv.innerHTML = `
+          <div><strong>📌 中文释义</strong><br>${extract("中文释义")}</div>
+          <div><strong>💬 英文例句</strong><br>${extract("英文例句")}</div>
+          <div><strong>💡 鼓励话语</strong><br>${extract("鼓励话语")}</div>
+        `;
+      } catch (err) {
+        explainDiv.innerHTML = "<em>请求失败，请检查网络或 API Key。</em>";
+      }
+    }
+
+    function loadWFDSentences(keyword) {
+      const resultsDiv = document.getElementById("results");
+      const matched = wfdData.filter(item =>
+        item.sentence.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      if (matched.length > 0) {
+        matched.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "card-result";
+          div.innerHTML = `
+            <strong>📝 匹配句子</strong><br>${item.sentence}<br>
+            <audio controls src="${item.audio}"></audio>
+          `;
+          resultsDiv.appendChild(div);
+        });
+      } else {
+        const div = document.createElement("div");
+        div.className = "card-result";
+        div.innerHTML = "<em>❌ 没找到匹配的句子</em>";
+        resultsDiv.appendChild(div);
+      }
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+  const progress = localStorage.getItem("taskProgress") || 0;
+  const total = 50; // 你有几道题就填多少
+  document.getElementById("progressText").innerText = `今日任务进度：${progress} / ${total}`;
+});
+
+  </script>
+</body>
+</html>

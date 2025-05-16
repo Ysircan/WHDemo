@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>任务答题 - Word Hunter</title>
+  <style>
+    body {
+      background-color: #f0f4fa;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .topbar {
+      padding: 20px;
+      background-color: #007bff;
+      color: white;
+      font-size: 18px;
+    }
+    .outer-box {
+      background-color: #e2e8f0;
+      padding: 40px 20px;
+      border-radius: 12px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+      width: 90%;
+      max-width: 500px;
+      margin: 40px auto;
+    }
+    .task-box {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .header-strip {
+      background-color: #007bff;
+      color: white;
+      font-size: 20px;
+      padding: 12px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .task-title {
+      font-size: 22px;
+      margin: 30px 0;
+      line-height: 1.6;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.5s forwards;
+    }
+    .option-btn {
+      display: block;
+      width: 80%;
+      margin: 10px auto;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #ffffff;
+      color: #333;
+      border: 2px solid #007bff;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.5s forwards;
+    }
+    .option-btn:hover {
+      background-color: #007bff;
+      color: white;
+    }
+    .feedback {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+       .navbar {
+  background-color: #007bff;
+  width: 100vw;
+  padding: 14px 40px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+}
+
+.nav-left {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #ffd700;
+}
+    #questionNav button:hover {
+  background-color: #d0e6ff !important;
+  border-color: #007bff !important;
+}
+
+  </style>
+</head>
+<body>
+<div class="navbar">
+  <div class="nav-left">
+    <a href="draw.html" class="nav-link">🃏 抽卡</a>
+    <a href="gallery.html" class="nav-link">🖼 图鉴</a>
+    <a href="audio.html" class="nav-link">🎧 听力练习</a>
+    <a href="wrong.html" class="nav-link">📘 错题本</a>
+    <a href="home.html" class="nav-link">🏠 主页</a>
+  </div>
+</div>
+
+
+  <div class="outer-box">
+      <div class="topbar" id="topbar">加载中...</div>
+    <div class="task-box">
+      <div class="header-strip">任务答题</div>
+      <div class="task-title" id="taskText">题目加载中...</div>
+      <div id="optionsContainer"></div>
+      <div class="feedback" id="feedbackText"></div>
+    </div>
+    <!-- ✅ 导航栏 -->
+  <div id="questionNav" style="width: 200px;"></div>
+
+  </div>
+
+  <script>
+    const tasks = [
+
+  {
+    type: "word",
+    word: "architecture",
+    answer: "建筑学",
+    options: ["建筑学", "工程", "绘画", "农业"]
+  },
+  {
+    type: "word",
+    word: "urbanization",
+    answer: "城市化",
+    options: ["城市化", "农村化", "工业化", "植被恢复"]
+  },
+  {
+    type: "word",
+    word: "provide",
+    answer: "提供",
+    options: ["提供", "需要", "购买", "修复"]
+  },
+  {
+    type: "word",
+    word: "expense",
+    answer: "花费",
+    options: ["花费", "收入", "利润", "打折"]
+  },
+  {
+    type: "word",
+    word: "management",
+    answer: "管理",
+    options: ["管理", "财务", "技术", "客户"]
+  },
+  {
+    type: "word",
+    word: "tricky",
+    answer: "棘手的",
+    options: ["棘手的", "简单的", "愉快的", "枯燥的"]
+  },
+  {
+    type: "word",
+    word: "pollution",
+    answer: "污染",
+    options: ["污染", "净化", "资源", "氧气"]
+  },
+  {
+    type: "word",
+    word: "serious",
+    answer: "严重的",
+    options: ["严重的", "搞笑的", "轻松的", "平常的"]
+  },
+  {
+    type: "word",
+    word: "course",
+    answer: "课程",
+    options: ["课程", "教室", "考试", "学期"]
+  },
+  {
+    type: "word",
+    word: "seminar",
+    answer: "研讨会",
+    options: ["研讨会", "实验室", "讲座", "展览"]
+  },
+  {
+    type: "word",
+    word: "scholarship",
+    answer: "奖学金",
+    options: ["奖学金", "工资", "学费", "贷款"]
+  },
+  {
+    type: "word",
+    word: "application",
+    answer: "申请",
+    options: ["申请", "拒绝", "计划", "总结"]
+  },
+  {
+    type: "word",
+    word: "shelf",
+    answer: "架子",
+    options: ["架子", "橱柜", "地板", "天花板"]
+  },
+  {
+    type: "word",
+    word: "reference",
+    answer: "参考",
+    options: ["参考", "会议", "报告", "提案"]
+  },
+  {
+    type: "word",
+    word: "workshop",
+    answer: "工作坊",
+    options: ["工作坊", "办公室", "工厂", "展览"]
+  },
+  {
+    type: "word",
+    word: "campus",
+    answer: "校园",
+    options: ["校园", "图书馆", "教堂", "超市"]
+  },
+  {
+    type: "word",
+    word: "deadline",
+    answer: "截止日期",
+    options: ["截止日期", "考试", "通知", "启动时间"]
+  },
+  {
+    type: "word",
+    word: "complete",
+    answer: "完成",
+    options: ["完成", "开始", "取消", "延迟"]
+  },
+  {
+    type: "word",
+    word: "direct",
+    answer: "指导",
+    options: ["指导", "忽略", "阻止", "转移"]
+  },
+  {
+    type: "word",
+    word: "essential",
+    answer: "必要的",
+    options: ["必要的", "无聊的", "奢侈的", "偶然的"]
+  },
+  {
+    type: "word",
+    word: "assistant",
+    answer: "助理",
+    options: ["助理", "经理", "客户", "教师"]
+  },
+  {
+    type: "word",
+    word: "styles",
+    answer: "风格",
+    options: ["风格", "语言", "任务", "作业"]
+  },
+  {
+    type: "word",
+    word: "subject",
+    answer: "科目",
+    options: ["科目", "对象", "物品", "内容"]
+  },
+  {
+    type: "word",
+    word: "invented",
+    answer: "发明",
+    options: ["发明", "发现", "出售", "模仿"]
+  },
+  {
+    type: "word",
+    word: "teenager",
+    answer: "青少年",
+    options: ["青少年", "儿童", "婴儿", "成人"]
+  },
+  {
+    type: "word",
+    word: "allow",
+    answer: "允许",
+    options: ["允许", "强迫", "反对", "禁止"]
+  },
+  {
+    type: "word",
+    word: "cloth",
+    answer: "布料",
+    options: ["布料", "服装", "纺织厂", "地毯"]
+  },
+  {
+    type: "word",
+    word: "accident",
+    answer: "事故",
+    options: ["事故", "计划", "安排", "建议"]
+  },
+  {
+    type: "word",
+    word: "discover",
+    answer: "发现",
+    options: ["发现", "发明", "发展", "分发"]
+  },
+  {
+    type: "word",
+    word: "achieve",
+    answer: "实现",
+    options: ["实现", "描述", "讨论", "尝试"]
+  }
+,
+  {
+    type: "listening",
+    audio: "audio/051.mp3",
+    sentence: "Scholarships are available for both ___ and ___ students.",
+    blanks: ["local", "international"]
+  },
+  {
+    type: "listening",
+    audio: "audio/052.mp3",
+    sentence: "All students have their own ___ of ___.",
+    blanks: ["style", "learning"]
+  },
+  {
+    type: "listening",
+    audio: "audio/053.mp3",
+    sentence: "We help ___ to develop and follow their ___.",
+    blanks: ["individuals", "interests"]
+  },
+  {
+    type: "listening",
+    audio: "audio/054.mp3",
+    sentence: "Our company currently ___ more than ten thousand people ___.",
+    blanks: ["employs", "worldwide"]
+  },
+  {
+    type: "listening",
+    audio: "audio/055.mp3",
+    sentence: "It is clear that the human ___ has an impact on the ___.",
+    blanks: ["population", "environment"]
+  },
+  {
+    type: "listening",
+    audio: "audio/056.mp3",
+    sentence: "Every ___ thing begins as a single ___.",
+    blanks: ["living", "cell"]
+  },
+  {
+    type: "listening",
+    audio: "audio/057.mp3",
+    sentence: "Technology is no longer a ___ tool that we can ___.",
+    blanks: ["simple", "control"]
+  },
+  {
+    type: "listening",
+    audio: "audio/058.mp3",
+    sentence: "British students must study ___ at secondary ___.",
+    blanks: ["mathematics", "schools"]
+  },
+  {
+    type: "listening",
+    audio: "audio/059.mp3",
+    sentence: "You need to ___ in an essay next ___.",
+    blanks: ["hand", "semester"]
+  },
+  {
+    type: "listening",
+    audio: "audio/060.mp3",
+    sentence: "Please click on the ___ above to enter the ___.",
+    blanks: ["logo", "site"]
+  },
+  {
+    type: "listening",
+    audio: "audio/061.mp3",
+    sentence: "If you need a parking ___, see me after the ___.",
+    blanks: ["ticket", "lecture"]
+  },
+  {
+    type: "listening",
+    audio: "audio/062.mp3",
+    sentence: "Advanced ___ created growth in the ___.",
+    blanks: ["technology", "economy"]
+  },
+  {
+    type: "listening",
+    audio: "audio/063.mp3",
+    sentence: "Optional ___ are offered in the final week of the ___.",
+    blanks: ["tutorials", "term"]
+  },
+  {
+    type: "listening",
+    audio: "audio/064.mp3",
+    sentence: "The aim of the course is to encourage students to develop their ___.",
+    blanks: ["creativity"]
+  },
+  {
+    type: "listening",
+    audio: "audio/065.mp3",
+    sentence: "___ have founded all parts of society today.",
+    blanks: ["Scientists"]
+  },
+  {
+    type: "listening",
+    audio: "audio/066.mp3",
+    sentence: "Practical ___ is a vital part of legal ___.",
+    blanks: ["experience", "training"]
+  },
+  {
+    type: "listening",
+    audio: "audio/067.mp3",
+    sentence: "There is a ___ on campus near the ___.",
+    blanks: ["pharmacy", "bookstore"]
+  },
+  {
+    type: "listening",
+    audio: "audio/068.mp3",
+    sentence: "The lecture will take place in the ___ ___.",
+    blanks: ["main", "hall"]
+  },
+  {
+    type: "listening",
+    audio: "audio/069.mp3",
+    sentence: "A wide range of ___ covered different ___ in this subject.",
+    blanks: ["courses", "aspects"]
+  },
+  {
+    type: "listening",
+    audio: "audio/070.mp3",
+    sentence: "In his lifetime, he ___ a large number of ___.",
+    blanks: ["composed", "works"]
+  }
+];
+
+
+    let currentIndex = parseInt(localStorage.getItem("taskIndex")) || 0;
+    let nickname = localStorage.getItem("userNickname") || "未命名用户";
+    const todayKey = new Date().toDateString();
+let isLocked = localStorage.getItem("taskCompleted_" + todayKey) === "true";
+
+
+function recordWrong(item) {
+  const today = new Date().toISOString().split("T")[0]; // e.g. "2025-05-16"
+  const lockKey = "taskCompleted_" + today;
+  const isLocked = localStorage.getItem(lockKey) === "true";
+
+  if (isLocked) {
+    console.log("今日任务已完成，不记录错题");
+    return;
+  }
+
+  const data = JSON.parse(localStorage.getItem("wrongRecords") || "{}");
+
+  if (!data[today]) data[today] = [];
+
+  data[today].push(item);
+
+  localStorage.setItem("wrongRecords", JSON.stringify(data));
+}
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+  function submitAnswer(selected) {
+  const correct = tasks[currentIndex].answer;
+  let points = parseInt(localStorage.getItem("points")) || 0;
+
+  if (!isLocked) {
+    if (selected === correct) {
+      points += 1;
+      localStorage.setItem("points", points);
+      document.getElementById("feedbackText").innerText = "✅ 正确！ +1积分";
+      localStorage.setItem("taskResult_" + currentIndex, "correct"); 
+      updateProgressRecord();
+
+       // ✅ 正确记录
+       
+    } else {
+      document.getElementById("feedbackText").innerText = "❌ 错误";
+      localStorage.setItem("taskResult_" + currentIndex, "wrong");    // ✅ 只错时记录 wrong
+      updateProgressRecord();
+
+      recordWrong({
+  type: "word",
+  question: tasks[currentIndex].word,
+  correct: correct,
+  userAnswer: selected
+});
+
+    }
+
+    if (currentIndex + 1 >= tasks.length) {
+    localStorage.setItem("taskCompleted_" + todayKey, "true");
+isLocked = true;
+
+    }
+
+  } else {
+    if (selected === correct) {
+      document.getElementById("feedbackText").innerText = "✅ 正确（积分已锁定）";
+      localStorage.setItem("taskResult_" + currentIndex, "correct");
+    } else {
+      document.getElementById("feedbackText").innerText = "❌ 错误（积分已锁定）";
+      localStorage.setItem("taskResult_" + currentIndex, "wrong");
+    }
+  }
+
+  currentIndex++;
+  localStorage.setItem("taskIndex", currentIndex);
+
+  setTimeout(() => {
+    loadTask();
+    updateTopBar();
+    setTimeout(() => {
+  loadTask();
+  updateTopBar();
+  renderQuestionNav(); // ✅ 添加这一行
+}, 800);
+
+  }, 800);
+}
+
+    renderQuestionNav();
+
+    function loadTask() {
+  if (currentIndex >= tasks.length) {
+    document.querySelector(".task-box").innerHTML = `
+      <div class="header-strip">✅ 恭喜完成第二阶段</div>
+      <div class="task-title">
+        📸 请联系老师完成照片打卡任务，<br>
+        成功后将获得<span style="color:#f39c12;"> +10积分</span>，并解锁🎁 第三次抽卡机会！
+        <br><br>
+        <button class="option-btn" onclick="restartTask()">🔁 再答一次</button>
+      </div>
+    `;
+    return;
+  }
+
+  const task = tasks[currentIndex];
+  document.getElementById("feedbackText").innerText = "";
+
+  if (task.type === "word") {
+    document.getElementById("taskText").innerText = `【第 ${currentIndex + 1} 题】"${task.word}" 的中文意思是？`;
+    const optionsHTML = shuffle([...task.options]).map(opt =>
+      `<button class="option-btn" onclick="submitAnswer('${opt}')">${opt}</button>`
+    ).join("");
+    document.getElementById("optionsContainer").innerHTML = optionsHTML;
+
+  } else if (task.type === "listening") {
+    document.getElementById("taskText").innerHTML = `
+      【第 ${currentIndex + 1} 题】请听音频并填写句子中的空：
+      <br><br><audio controls src="${task.audio}"></audio><br><br>
+    `;
+
+    let parts = task.sentence.split("___");
+    let html = "";
+    for (let i = 0; i < parts.length; i++) {
+      html += parts[i];
+      if (i < task.blanks.length) {
+        html += `<input type="text" class="input-blank" style="width: 80px; padding: 6px; font-size: 16px; margin: 0 4px;">`;
+      }
+    }
+    html += `<br><br><button class="option-btn" onclick="submitListening()">提交</button>`;
+
+    document.getElementById("optionsContainer").innerHTML = html;
+  }
+}
+renderQuestionNav();
+
+
+    function updateTopBar() {
+      const points = parseInt(localStorage.getItem("points")) || 0;
+      document.getElementById("topbar").innerText = `你好，${nickname} ｜ 当前积分：${points}`;
+    }
+
+    function restartTask() {
+      localStorage.removeItem("taskIndex");
+      location.reload();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      updateTopBar();
+      loadTask();
+    });
+    let hasSubmitted = false; // 全局状态：是否已提交答案
+
+function submitListening() {
+  const inputs = document.querySelectorAll(".input-blank");
+  const task = tasks[currentIndex];
+  const feedback = document.getElementById("feedbackText");
+  const button = document.querySelector(".option-btn");
+
+  if (!hasSubmitted) {
+    // 第一次点击：执行判题逻辑
+    let correct = true;
+    let points = parseInt(localStorage.getItem("points")) || 0;
+
+    inputs.forEach((input, index) => {
+      const userAnswer = input.value.trim().toLowerCase();
+      const expected = task.blanks[index].toLowerCase();
+
+      // 清除旧标记
+      const oldMark = input.nextElementSibling;
+      if (oldMark && oldMark.classList.contains("result-icon")) oldMark.remove();
+
+      // 添加新标记
+      const mark = document.createElement("span");
+      mark.classList.add("result-icon");
+      mark.style.marginLeft = "6px";
+      mark.style.fontWeight = "bold";
+
+      if (userAnswer === expected) {
+        mark.innerText = "✔";
+        mark.style.color = "green";
+      } else {
+        mark.innerText = "✘";
+        mark.style.color = "red";
+        correct = false;
+      }
+
+      input.after(mark);
+      input.disabled = true;
+    });
+
+    // 积分逻辑
+    if (!isLocked) {
+      if (correct) {
+        points += 1;
+        localStorage.setItem("points", points);
+        feedback.innerText = "✅ 全部正确！+1积分";
+        updateProgressRecord();
+
+
+      } else {
+        feedback.innerText = "❌ 有错误，未加分";
+        localStorage.setItem("taskResult_" + currentIndex, "wrong");
+        updateProgressRecord();
+
+        recordWrong({
+  type: "listening",
+  sentence: task.sentence,
+  correctBlanks: task.blanks,
+  userAnswers: Array.from(inputs).map(i => i.value.trim())
+});
+
+
+      }
+
+  if (currentIndex + 1 >= tasks.length) {
+  const todayKey = new Date().toDateString();
+  localStorage.setItem("taskCompleted_" + todayKey, "true");
+  isLocked = true;
+}
+
+    } else {
+      feedback.innerText = correct ? "✅ 正确（积分已锁定）" : "❌ 错误（积分已锁定）";
+    }
+
+    // 修改按钮为“下一题”
+    button.innerText = "➡️ 下一题";
+    hasSubmitted = true;
+
+  } else {
+    // 第二次点击：进入下一题
+    hasSubmitted = false;
+    currentIndex++;
+    localStorage.setItem("taskIndex", currentIndex);
+    loadTask();
+    updateTopBar();
+renderQuestionNav(); // ✅ 添加这一行
+
+  }
+}
+renderQuestionNav();
+
+function renderQuestionNav() {
+  const nav = document.getElementById("questionNav");
+  let html = "<div style='font-weight: bold; margin-bottom: 12px;'>题目跳转</div><div style='display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;'>";
+
+for (let i = 0; i < tasks.length; i++) {
+  const isCurrent = i === currentIndex;
+  const result = localStorage.getItem("taskResult_" + i);
+
+  let borderColor, bgColor, textColor;
+
+  if (isCurrent) {
+    // 当前题目优先级最高
+    borderColor = '#007bff';
+    bgColor = '#e6f0ff';
+    textColor = '#007bff';
+  } else if (result === "correct") {
+    // 正确：绿色
+    borderColor = '#28a745';
+    bgColor = '#e6f9ec';
+    textColor = '#28a745';
+  } else if (result === "wrong") {
+    // 错误：红色
+    borderColor = '#dc3545';
+    bgColor = '#fdecea';
+    textColor = '#dc3545';
+  } else {
+    // 未做题
+    borderColor = '#ccc';
+    bgColor = '#f2f2f2';
+    textColor = '#333';
+  }
+
+  html += `<button 
+    onclick="jumpTo(${i})"
+    style="
+      width: 34px;
+      height: 34px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 6px;
+      border: 2px solid ${borderColor};
+      background-color: ${bgColor};
+      color: ${textColor};
+      cursor: pointer;
+    "
+  >${i + 1}</button>`;
+}
+
+  html += "</div>";
+  nav.innerHTML = html;
+}
+
+
+
+
+
+function jumpTo(index) {
+  currentIndex = index;
+  localStorage.setItem("taskIndex", currentIndex);
+  hasSubmitted = false;
+  loadTask();
+ renderQuestionNav();
+
+  updateTopBar();
+}
+function updateProgressRecord() {
+  let count = 0;
+  for (let i = 0; i < tasks.length; i++) {
+    const result = localStorage.getItem("taskResult_" + i);
+    if (result) count++;
+  }
+  localStorage.setItem("taskProgress", count);
+}
+
+
+  </script>
+
+</body>
+</html>   

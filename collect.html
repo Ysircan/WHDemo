@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>图鉴 - Word Hunter</title>
+  <style>
+    body {
+      background-color: #f2f2f2;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    .progress {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .card {
+      width: 100%;
+      height: 160px;
+      border-radius: 12px;
+      background-color: #ddd;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .locked {
+      background-color: #ccc;
+      filter: grayscale(1);
+      position: relative;
+    }
+
+    .locked::after {
+      content: "未解锁";
+      position: absolute;
+      bottom: 8px;
+      left: 0;
+      right: 0;
+      color: white;
+      background: rgba(0,0,0,0.6);
+      font-size: 14px;
+      padding: 4px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>词卡图鉴</h1>
+  <div class="progress">已收集：15 / 50 张卡牌</div>
+
+  <div class="gallery">
+    <div class="card"><img src="img/card001.jpg" alt="Card 001"></div>
+    <div class="card"><img src="img/card002.jpg" alt="Card 002"></div>
+    <div class="card locked"></div>
+    <div class="card"><img src="img/card003.jpg" alt="Card 003"></div>
+    <div class="card locked"></div>
+    <!-- 更多卡牌 -->
+  </div>
+</body>
+</html>

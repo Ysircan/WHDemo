@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>第三次抽卡</title>
+  <style>
+    body {
+      background-color: #f0f4fa;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .outer-box {
+      background-color: #e2e8f0;
+      padding: 40px 20px;
+      border-radius: 12px;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+      width: 90%;
+      max-width: 500px;
+      margin: 40px auto;
+    }
+    .task-box {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    .header-strip {
+      background-color: #f39c12;
+      color: white;
+      font-size: 20px;
+      padding: 12px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .task-title {
+      font-size: 22px;
+      margin: 30px 0;
+      line-height: 1.6;
+    }
+    .btn-confirm {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="nav-left">
+          <a href="draw.html" class="nav-link">🃏 抽卡</a>
+          <a href="gallery.html" class="nav-link">🖼 图鉴</a>
+          <a href="home.html" class="nav-link">🏠 主页</a>
+        </div>
+      </div>
+      
+      <style>
+        .navbar {
+          background-color: #007bff;
+          padding: 10px 20px;
+        }
+        .nav-left {
+          display: flex;
+          gap: 20px;
+        }
+        .nav-link {
+          color: white;
+          text-decoration: none;
+          font-weight: bold;
+          font-size: 16px;
+        }
+        .nav-link:hover {
+          text-decoration: underline;
+        }
+      </style>
+      
+  <div class="outer-box">
+    <div class="task-box">
+      <div class="header-strip">🎉 恭喜获得 +10 积分</div>
+      <div class="task-title">
+        你的照片打卡任务已审核通过，获得了 <strong style="color:#f39c12;">额外10积分</strong>！<br><br>
+         是否现在进行 <strong>抽卡</strong>？
+      </div>
+      <button class="btn-confirm" onclick="goToDraw()">立即抽卡</button>
+    </div>
+  </div>
+
+  <script>
+    function goToDraw() {
+      window.location.href = "draw.html";
+    }
+  </script>
+</body>
+</html>

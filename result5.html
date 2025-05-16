@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>五连抽结果 - Word Hunter</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 10px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      margin-bottom: 40px;
+      align-items: center;
+    }
+
+    .card-slot {
+      width: 320px;
+      height: 460px;
+      perspective: 1000px;
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-inner {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+
+    .card-slot.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-back, .card-front {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      backface-visibility: hidden;
+      box-shadow: 0 0 20px gold, 0 0 40px orange;
+    }
+
+    .card-back {
+      background: url('card-back.jpg') no-repeat center/cover;
+    }
+
+    .card-front {
+      transform: rotateY(180deg);
+    }
+
+    .card-front iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      border-radius: 12px;
+    }
+
+    .particle-burst {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      width: 320px;
+      height: 460px;
+      overflow: visible;
+      z-index: 2;
+    }
+
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: gold;
+      border-radius: 50%;
+      animation: burst 0.8s ease-out forwards;
+    }
+
+    @keyframes burst {
+      0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--x), var(--y)) scale(0.5);
+        opacity: 0;
+      }
+    }
+
+    .btn {
+      margin: 10px;
+      padding: 12px 24px;
+      background: linear-gradient(45deg, gold, orange);
+      color: black;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 10px gold;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <h1>点击卡牌翻转，查看你抽中了什么！</h1>
+
+    <div class="card-list" id="cardList">
+      <!-- 卡片将通过 JS 插入 -->
+    </div>
+
+    <div>
+      <button class="btn" onclick="location.href='draw.html'">继续抽卡</button>
+      <button class="btn" onclick="location.href='task.html'">继续答题</button>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById("cardList");
+    const cards = JSON.parse(localStorage.getItem("lastFiveCards")) || [];
+
+    if (cards.length === 0) {
+      container.innerHTML = "<p style='color: gold;'>未找到抽卡记录，请返回重试。</p>";
+    } else {
+      cards.forEach(url => {
+        const slot = document.createElement("div");
+        slot.className = "card-slot";
+
+        const inner = document.createElement("div");
+        inner.className = "card-inner";
+
+        const back = document.createElement("div");
+        back.className = "card-back";
+
+        const front = document.createElement("div");
+        front.className = "card-front";
+        front.innerHTML = `<iframe src="${url}"></iframe>`;
+
+        const burst = document.createElement("div");
+        burst.className = "particle-burst";
+
+        inner.appendChild(back);
+        inner.appendChild(front);
+        slot.appendChild(inner);
+        slot.appendChild(burst);
+        container.appendChild(slot);
+
+        // 翻转 + 粒子爆炸
+        slot.addEventListener("click", () => {
+          slot.classList.toggle("flipped");
+          showParticles(burst);
+        });
+      });
+    }
+
+    function showParticles(container) {
+      container.innerHTML = ''; // 清空旧粒子
+      for (let i = 0; i < 25; i++) {
+        const p = document.createElement("div");
+        p.className = "particle";
+        const angle = Math.random() * 2 * Math.PI;
+        const radius = 150 + Math.random() * 100;
+        const x = Math.cos(angle) * radius + "px";
+        const y = Math.sin(angle) * radius + "px";
+        p.style.setProperty('--x', x);
+        p.style.setProperty('--y', y);
+        container.appendChild(p);
+      }
+    }
+  </script>
+
+</body>
+</html>

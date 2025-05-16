@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>WFD AI 点一点</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f6f8fa;
+      max-width: 600px;
+      margin: auto;
+      padding: 40px;
+    }
+    h1 {
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px 0;
+    }
+    #searchInput {
+      width: 80%;
+      display: block;
+      margin: 0 auto;
+    }
+    button {
+      width: 150px;
+      display: block;
+      margin: 10px auto;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .result {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-left: 5px solid #007bff;
+      margin: 8px 0;
+      padding: 12px;
+      border-radius: 6px;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>WFD AI 点一点</h1>
+<input type="text" id="searchInput" placeholder="输入一个单词..." />
+<button onclick="search()">点我找句子</button>
+<div id="results"></div>
+
+<script>
+const apiKey = "Bearer cd36d50e081044d99e1d32351c52cc98.zFxAEVWLHCmFuS2n";
+
+
+function normalize(word) {
+  return word.toLowerCase().replace(/(ed|s|ing)$/, '');
+}
+
+function search() {
+  const keyword = normalize(document.getElementById("searchInput").value.trim());
+  const resultsDiv = document.getElementById("results");
+  resultsDiv.innerHTML = "";
+
+  if (!keyword) {
+    resultsDiv.innerHTML = "<p>请输入单词</p>";
+    return;
+  }
+
+  explainWord(keyword);
+}
+
+async function explainWord(word) {
+  const explainDiv = document.createElement("div");
+  explainDiv.className = "result";
+  explainDiv.innerHTML = "<em>正在加载 AI 解释...</em>";
+  document.getElementById("results").prepend(explainDiv);
+
+  try {
+    const res = await fetch("https://open.bigmodel.cn/api/paas/v3/model-api/chatglm_turbo/invoke", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": apiKey
+      },
+      body: JSON.stringify({
+        prompt: `请根据用户输入的英文单词 "${word}"，按以下格式返回内容（不要加编号，不要换行，不要解释）：
+[中文释义] 中文意思（最多10字）
+[英文例句] 含有 ${word} 的英文句子
+[鼓励话语] 结尾鼓励语`,
+        temperature: 0.7,
+        top_p: 0.9
+      })
+    });
+
+    const data = await res.json();
+    const content = data.data?.choices?.[0]?.content || "";
+
+    const extract = (label) => {
+      const match = content.match(new RegExp(`\\[${label}\\](.*?)($|\\[)`, 's'));
+      return match ? match[1].trim() : "（无内容）";
+    };
+
+    const zh = extract("中文释义");
+    const en = extract("英文例句");
+    const tip = extract("鼓励话语");
+
+    explainDiv.innerHTML = `
+      <strong>AI讲解：</strong>
+      <div class="card"><strong>📌 中文释义</strong><br>${zh}</div>
+      <div class="card"><strong>💬 英文例句</strong><br>${en}</div>
+      <div class="card"><strong>💡 鼓励话语</strong><br>${tip}</div>
+    `;
+  } catch (err) {
+    explainDiv.innerHTML = "<em>请求失败，请检查网络或 API Key。</em>";
+    console.error(err);
+  }
+}
+</script>
+
+</body>
+</html>
